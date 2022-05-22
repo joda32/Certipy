@@ -182,11 +182,16 @@ class Find:
             ca_name = enrollment_service.get("cn")
             dns_name = enrollment_service.get("dNSHostName")
             subject_name = enrollment_service.get("cACertificateDN")
-
-            ca_certificate = x509.Certificate.load(
-                enrollment_service.get("cACertificate")[0]
-            )["tbs_certificate"]
-
+            try:
+                ca_certificate = x509.Certificate.load(
+                    enrollment_service.get("cACertificate")[0]
+                )["tbs_certificate"]
+            except Exception as ex:
+                logging.warning(
+                    "Failed getting enrollment services CA, moving on"
+                
+                )
+                continue
             serial_number = hex(int(ca_certificate["serial_number"]))[2:].upper()
 
             validity = ca_certificate["validity"].native
